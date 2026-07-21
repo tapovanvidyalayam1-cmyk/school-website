@@ -627,18 +627,6 @@ table.data-table tr:last-child td { border-bottom: none; }
   align-items: flex-start;
 }
 .contact-info .icon-circle { margin-bottom: 0; flex-shrink: 0; }
-.map-embed {
-  width: 100%;
-  height: 220px;
-  border-radius: var(--radius);
-  background: repeating-linear-gradient(45deg, #dbe6ee, #dbe6ee 10px, #cfe0ec 10px, #cfe0ec 20px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--navy);
-  font-weight: 600;
-  margin-top: 20px;
-}
 
 form.contact-form { display: flex; flex-direction: column; gap: 16px; }
 form.contact-form label { font-weight: 600; font-size: 0.9rem; color: var(--navy-dark); margin-bottom: -10px; }
