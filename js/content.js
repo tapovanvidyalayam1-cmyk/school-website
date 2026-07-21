@@ -79,13 +79,68 @@ const SHEET_URLS = {
       .catch(function () { return null; });
   }
 
-  function isValidIsoDate(s) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
-    try {
-      return !isNaN(new Date(s + "T00:00:00"));
-    } catch (e) {
-      return false;
+  // Understands whatever date format staff naturally type — "2026-07-25",
+  // "25 Jul 2026", "Jul 25, 2026", or just "Jul 25" with no year at all.
+  // Deliberately does NOT use the browser's native string-to-Date parsing
+  // (new Date("some string")) — that's implementation-defined and varies
+  // subtly across browsers, plus plain numeric dates like "6/5/2026" are
+  // genuinely ambiguous (June 5 or May 6?). Instead this only ever builds
+  // dates via the numeric Date(year, month, day) constructor, which is
+  // spec-guaranteed identical everywhere.
+  const MONTHS = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11 };
+
+  function pad2(n) {
+    n = String(n);
+    return n.length < 2 ? "0" + n : n;
+  }
+
+  function isoFromParts(year, monthIndex, day) {
+    return year + "-" + pad2(monthIndex + 1) + "-" + pad2(day);
+  }
+
+  function toIsoDate(raw, now) {
+    const s = String(raw || "").trim();
+    if (!s) return null;
+
+    const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) {
+      const y = +iso[1], mo = +iso[2], da = +iso[3];
+      return (mo >= 1 && mo <= 12 && da >= 1 && da <= 31) ? s : null;
     }
+
+    // "25 Jul 2026" / "25 July 2026"
+    const m1 = s.match(/^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$/);
+    // "Jul 25 2026" / "Jul 25, 2026" / "July 25 2026"
+    const m2 = s.match(/^([a-zA-Z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+    // "25 Jul" (no year)
+    const m3 = s.match(/^(\d{1,2})\s+([a-zA-Z]+)$/);
+    // "Jul 25" (no year)
+    const m4 = s.match(/^([a-zA-Z]+)\s+(\d{1,2})$/);
+
+    let day, monthName, year;
+    if (m1) { day = +m1[1]; monthName = m1[2]; year = +m1[3]; }
+    else if (m2) { monthName = m2[1]; day = +m2[2]; year = +m2[3]; }
+    else if (m3) { day = +m3[1]; monthName = m3[2]; }
+    else if (m4) { monthName = m4[1]; day = +m4[2]; }
+    else return null;
+
+    const monthIndex = MONTHS[monthName.slice(0, 3).toLowerCase()];
+    if (monthIndex === undefined || day < 1 || day > 31) return null;
+
+    if (year === undefined) {
+      // No year given: assume this year, unless that date already passed
+      // more than a month ago — then it almost certainly means next year.
+      year = now.getFullYear();
+      const guess = new Date(year, monthIndex, day);
+      if ((now - guess) / 86400000 > 31) year += 1;
+    }
+
+    // Round-trip through the numeric constructor to reject impossible
+    // dates like "30 Feb".
+    const d = new Date(year, monthIndex, day);
+    if (d.getFullYear() !== year || d.getMonth() !== monthIndex || d.getDate() !== day) return null;
+
+    return isoFromParts(year, monthIndex, day);
   }
 
   function formatDate(iso) {
@@ -94,16 +149,25 @@ const SHEET_URLS = {
     return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   }
 
-  // Rows with a Date that isn't exactly YYYY-MM-DD are dropped rather than
-  // sorted/bucketed incorrectly — a malformed date silently sorting into the
-  // wrong place is worse than the row briefly not appearing at all. Logged
-  // to the console so a developer can spot a sheet typo if asked to check.
+  // Normalizes each row's Date to YYYY-MM-DD so sorting/comparison is
+  // always a reliable string comparison. Rows with a date that couldn't be
+  // understood at all are dropped (logged to the console) rather than
+  // risk sorting into the wrong place.
   function withValidDates(rows, sheetName) {
-    return rows.filter(function (r) {
-      if (isValidIsoDate(r.date)) return true;
-      console.warn('[content.js] Skipping ' + sheetName + ' row with invalid Date "' + r.date + '" — expected format YYYY-MM-DD.', r);
-      return false;
+    const now = new Date();
+    const out = [];
+    rows.forEach(function (r) {
+      const iso = toIsoDate(r.date, now);
+      if (iso) {
+        const copy = {};
+        for (const k in r) copy[k] = r[k];
+        copy.date = iso;
+        out.push(copy);
+      } else {
+        console.warn('[content.js] Skipping ' + sheetName + ' row — could not understand date "' + r.date + '".', r);
+      }
     });
+    return out;
   }
 
   function escapeHtml(s) {
