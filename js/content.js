@@ -16,9 +16,9 @@
 // ============================================================
 
 const SHEET_URLS = {
-  notices: "PASTE_NOTICES_TAB_URL_HERE",
-  events: "PASTE_EVENTS_TAB_URL_HERE",
-  calendar: "PASTE_CALENDAR_TAB_URL_HERE",
+  notices: "https://docs.google.com/spreadsheets/d/1F3aoLYcwQK5tZrqB300NuuO2vaCRvR7FQYzG6Xabr7c/edit?gid=0#gid=0",
+  events: "https://docs.google.com/spreadsheets/d/1F3aoLYcwQK5tZrqB300NuuO2vaCRvR7FQYzG6Xabr7c/edit?gid=1772877973#gid=1772877973",
+  calendar: "https://docs.google.com/spreadsheets/d/1F3aoLYcwQK5tZrqB300NuuO2vaCRvR7FQYzG6Xabr7c/edit?gid=414072694#gid=414072694",
 };
 
 (function () {
