@@ -9,7 +9,7 @@
 // offline), the page quietly keeps showing the plain HTML already on the
 // page instead of breaking.
 //
-// ONE-TIME SETUP (see STAFF_GUIDE.md for full steps):
+// ONE-TIME SETUP (ask the site maintainer for the full staff guide):
 // 1. Create a Google Sheet with 3 tabs named exactly: Notices, Events, Calendar
 // 2. Share it: Share button -> General access -> "Anyone with the link" -> Viewer
 // 3. Open each tab, copy its URL from the browser address bar, paste it below.
@@ -108,14 +108,14 @@ const SHEET_URLS = {
       return (mo >= 1 && mo <= 12 && da >= 1 && da <= 31) ? s : null;
     }
 
-    // "25 Jul 2026" / "25 July 2026"
-    const m1 = s.match(/^(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})$/);
-    // "Jul 25 2026" / "Jul 25, 2026" / "July 25 2026"
-    const m2 = s.match(/^([a-zA-Z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
-    // "25 Jul" (no year)
-    const m3 = s.match(/^(\d{1,2})\s+([a-zA-Z]+)$/);
-    // "Jul 25" (no year)
-    const m4 = s.match(/^([a-zA-Z]+)\s+(\d{1,2})$/);
+    // "25 Jul 2026" / "25th July 2026"
+    const m1 = s.match(/^(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]+)\s+(\d{4})$/i);
+    // "Jul 25 2026" / "Jul 25th, 2026" / "July 25 2026"
+    const m2 = s.match(/^([a-zA-Z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})$/i);
+    // "25th Jul" (no year)
+    const m3 = s.match(/^(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]+)$/i);
+    // "Jul 25th" (no year)
+    const m4 = s.match(/^([a-zA-Z]+)\s+(\d{1,2})(?:st|nd|rd|th)?$/i);
 
     let day, monthName, year;
     if (m1) { day = +m1[1]; monthName = m1[2]; year = +m1[3]; }
