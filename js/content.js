@@ -79,10 +79,31 @@ const SHEET_URLS = {
       .catch(function () { return null; });
   }
 
+  function isValidIsoDate(s) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+    try {
+      return !isNaN(new Date(s + "T00:00:00"));
+    } catch (e) {
+      return false;
+    }
+  }
+
   function formatDate(iso) {
     const d = new Date(iso + "T00:00:00");
     if (isNaN(d)) return iso;
     return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  // Rows with a Date that isn't exactly YYYY-MM-DD are dropped rather than
+  // sorted/bucketed incorrectly — a malformed date silently sorting into the
+  // wrong place is worse than the row briefly not appearing at all. Logged
+  // to the console so a developer can spot a sheet typo if asked to check.
+  function withValidDates(rows, sheetName) {
+    return rows.filter(function (r) {
+      if (isValidIsoDate(r.date)) return true;
+      console.warn('[content.js] Skipping ' + sheetName + ' row with invalid Date "' + r.date + '" — expected format YYYY-MM-DD.', r);
+      return false;
+    });
   }
 
   function escapeHtml(s) {
@@ -103,7 +124,7 @@ const SHEET_URLS = {
   }
 
   function renderNotices(notices) {
-    const sorted = notices.slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+    const sorted = withValidDates(notices, "Notices").sort(function (a, b) { return b.date.localeCompare(a.date); });
 
     const fullList = document.getElementById("notices-list");
     if (fullList) fullList.innerHTML = sorted.map(noticeItemHtml).join("");
@@ -121,10 +142,11 @@ const SHEET_URLS = {
   }
 
   function renderEvents(events) {
+    const validEvents = withValidDates(events, "Events");
     const todayIso = new Date().toISOString().slice(0, 10);
-    const upcoming = events.filter(function (e) { return e.date >= todayIso; })
+    const upcoming = validEvents.filter(function (e) { return e.date >= todayIso; })
       .sort(function (a, b) { return a.date.localeCompare(b.date); });
-    const past = events.filter(function (e) { return e.date < todayIso; })
+    const past = validEvents.filter(function (e) { return e.date < todayIso; })
       .sort(function (a, b) { return b.date.localeCompare(a.date); })
       .slice(0, 6);
 
