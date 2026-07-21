@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         message
       ].join("\n");
 
-      window.location.href = "mailto:info@tapovanvidyalayam.edu.in" +
+      window.location.href = "mailto:tapovanvidyalayam1@gmail.com" +
         "?subject=" + encodeURIComponent("Website enquiry from " + name) +
         "&body=" + encodeURIComponent(body);
 
