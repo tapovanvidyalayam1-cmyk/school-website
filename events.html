@@ -51,7 +51,7 @@
       <div class="eyebrow">Mark Your Calendar</div>
       <h2>Upcoming Events</h2>
     </div>
-    <div class="timeline" id="events-upcoming">
+    <div class="timeline" id="events-upcoming" style="opacity:0; transition: opacity 0.3s ease;">
       <div class="timeline-item">
         <span class="date">05 Aug 2026</span>
         <h3>Parent-Teacher Meeting</h3>
@@ -77,7 +77,7 @@
       <div class="eyebrow">Looking Back</div>
       <h2>Recent Highlights</h2>
     </div>
-    <div class="timeline" id="events-recent">
+    <div class="timeline" id="events-recent" style="opacity:0; transition: opacity 0.3s ease;">
       <div class="timeline-item">
         <span class="date">15 Jul 2026</span>
         <h3>Annual Sports Day</h3>
@@ -151,6 +151,15 @@
   </div>
 </footer>
 
+<noscript><style>#notices-list, #notices-home-list, #events-upcoming, #events-recent, #calendar-body { opacity: 1 !important; }</style></noscript>
+<script>
+  setTimeout(function () {
+    ["notices-list", "notices-home-list", "events-upcoming", "events-recent", "calendar-body"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.style.opacity === "0") el.style.opacity = "1";
+    });
+  }, 4000);
+</script>
 <script src="js/script.js"></script>
 <script src="js/content.js"></script>
 </body>

@@ -119,7 +119,7 @@
       <div class="eyebrow">Stay Informed</div>
       <h2>Latest Notices</h2>
     </div>
-    <ul class="notice-list" id="notices-home-list">
+    <ul class="notice-list" id="notices-home-list" style="opacity:0; transition: opacity 0.3s ease;">
       <li>
         <div>
           <span class="tag">Event</span>
@@ -184,6 +184,18 @@
   </div>
 </footer>
 
+<noscript><style>#notices-list, #notices-home-list, #events-upcoming, #events-recent, #calendar-body { opacity: 1 !important; }</style></noscript>
+<script>
+  // Safety net: if js/content.js fails to load or errors out for any
+  // reason, make sure the sections it's responsible for don't stay
+  // invisible forever.
+  setTimeout(function () {
+    ["notices-list", "notices-home-list", "events-upcoming", "events-recent", "calendar-body"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.style.opacity === "0") el.style.opacity = "1";
+    });
+  }, 4000);
+</script>
 <script src="js/script.js"></script>
 <script src="js/content.js"></script>
 </body>

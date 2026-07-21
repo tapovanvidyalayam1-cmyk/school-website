@@ -170,18 +170,25 @@ const SHEET_URLS = {
     return out;
   }
 
-  // Swaps an element's content with a brief cross-fade instead of an
-  // instant replace, so the switch from the page's static placeholder
-  // content to the live sheet content reads as an intentional update
-  // rather than a jarring flash.
-  function fadeReplace(el, html) {
+  // These sections start invisible (opacity:0 inline in the HTML) so the
+  // visitor never sees the static placeholder content on screen at all —
+  // whichever content turns out to be final (live sheet data, or the
+  // static fallback if the sheet has nothing yet) is set first, then the
+  // section fades in once, already correct. Nothing ever visibly changes
+  // in front of the visitor.
+  function reveal(el) {
     if (!el) return;
-    el.style.transition = "opacity 0.2s ease";
-    el.style.opacity = "0";
-    setTimeout(function () {
-      el.innerHTML = html;
-      el.style.opacity = "1";
-    }, 200);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        el.style.opacity = "1";
+      });
+    });
+  }
+
+  function setHtmlAndReveal(el, html) {
+    if (!el) return;
+    el.innerHTML = html;
+    reveal(el);
   }
 
   function escapeHtml(s) {
@@ -204,8 +211,8 @@ const SHEET_URLS = {
   function renderNotices(notices) {
     const sorted = withValidDates(notices, "Notices").sort(function (a, b) { return b.date.localeCompare(a.date); });
 
-    fadeReplace(document.getElementById("notices-list"), sorted.map(noticeItemHtml).join(""));
-    fadeReplace(document.getElementById("notices-home-list"), sorted.slice(0, 2).map(noticeItemHtml).join(""));
+    setHtmlAndReveal(document.getElementById("notices-list"), sorted.map(noticeItemHtml).join(""));
+    setHtmlAndReveal(document.getElementById("notices-home-list"), sorted.slice(0, 2).map(noticeItemHtml).join(""));
   }
 
   function eventItemHtml(e) {
@@ -225,11 +232,11 @@ const SHEET_URLS = {
       .sort(function (a, b) { return b.date.localeCompare(a.date); })
       .slice(0, 6);
 
-    fadeReplace(
+    setHtmlAndReveal(
       document.getElementById("events-upcoming"),
       upcoming.length ? upcoming.map(eventItemHtml).join("") : "<p>No upcoming events posted right now — check back soon.</p>"
     );
-    fadeReplace(
+    setHtmlAndReveal(
       document.getElementById("events-recent"),
       past.length ? past.map(eventItemHtml).join("") : "<p>Nothing to look back on just yet.</p>"
     );
@@ -239,18 +246,47 @@ const SHEET_URLS = {
     const html = rows.map(function (r) {
       return '<tr><td>' + escapeHtml(r.term) + '</td><td>' + escapeHtml(r.duration) + '</td><td>' + escapeHtml(r.assessment) + '</td></tr>';
     }).join("");
-    fadeReplace(document.getElementById("calendar-body"), html);
+    setHtmlAndReveal(document.getElementById("calendar-body"), html);
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    if (document.getElementById("notices-list") || document.getElementById("notices-home-list")) {
-      fetchSheet("notices").then(function (rows) { if (rows && rows.length) renderNotices(rows); });
+    const noticesListEl = document.getElementById("notices-list");
+    const noticesHomeEl = document.getElementById("notices-home-list");
+    if (noticesListEl || noticesHomeEl) {
+      fetchSheet("notices").then(function (rows) {
+        if (rows && rows.length) {
+          renderNotices(rows);
+        } else {
+          // No sheet data (not set up yet, or unreachable) — reveal the
+          // static placeholder content that's already sitting in the page.
+          reveal(noticesListEl);
+          reveal(noticesHomeEl);
+        }
+      });
     }
-    if (document.getElementById("events-upcoming") || document.getElementById("events-recent")) {
-      fetchSheet("events").then(function (rows) { if (rows && rows.length) renderEvents(rows); });
+
+    const upcomingEl = document.getElementById("events-upcoming");
+    const recentEl = document.getElementById("events-recent");
+    if (upcomingEl || recentEl) {
+      fetchSheet("events").then(function (rows) {
+        if (rows && rows.length) {
+          renderEvents(rows);
+        } else {
+          reveal(upcomingEl);
+          reveal(recentEl);
+        }
+      });
     }
-    if (document.getElementById("calendar-body")) {
-      fetchSheet("calendar").then(function (rows) { if (rows && rows.length) renderCalendar(rows); });
+
+    const calendarEl = document.getElementById("calendar-body");
+    if (calendarEl) {
+      fetchSheet("calendar").then(function (rows) {
+        if (rows && rows.length) {
+          renderCalendar(rows);
+        } else {
+          reveal(calendarEl);
+        }
+      });
     }
   });
 })();
