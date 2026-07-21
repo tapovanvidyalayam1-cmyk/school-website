@@ -170,6 +170,20 @@ const SHEET_URLS = {
     return out;
   }
 
+  // Swaps an element's content with a brief cross-fade instead of an
+  // instant replace, so the switch from the page's static placeholder
+  // content to the live sheet content reads as an intentional update
+  // rather than a jarring flash.
+  function fadeReplace(el, html) {
+    if (!el) return;
+    el.style.transition = "opacity 0.2s ease";
+    el.style.opacity = "0";
+    setTimeout(function () {
+      el.innerHTML = html;
+      el.style.opacity = "1";
+    }, 200);
+  }
+
   function escapeHtml(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -190,11 +204,8 @@ const SHEET_URLS = {
   function renderNotices(notices) {
     const sorted = withValidDates(notices, "Notices").sort(function (a, b) { return b.date.localeCompare(a.date); });
 
-    const fullList = document.getElementById("notices-list");
-    if (fullList) fullList.innerHTML = sorted.map(noticeItemHtml).join("");
-
-    const homeList = document.getElementById("notices-home-list");
-    if (homeList) homeList.innerHTML = sorted.slice(0, 2).map(noticeItemHtml).join("");
+    fadeReplace(document.getElementById("notices-list"), sorted.map(noticeItemHtml).join(""));
+    fadeReplace(document.getElementById("notices-home-list"), sorted.slice(0, 2).map(noticeItemHtml).join(""));
   }
 
   function eventItemHtml(e) {
@@ -214,23 +225,21 @@ const SHEET_URLS = {
       .sort(function (a, b) { return b.date.localeCompare(a.date); })
       .slice(0, 6);
 
-    const upcomingEl = document.getElementById("events-upcoming");
-    if (upcomingEl) {
-      upcomingEl.innerHTML = upcoming.length
-        ? upcoming.map(eventItemHtml).join("")
-        : "<p>No upcoming events posted right now — check back soon.</p>";
-    }
-
-    const pastEl = document.getElementById("events-recent");
-    if (pastEl) pastEl.innerHTML = past.map(eventItemHtml).join("");
+    fadeReplace(
+      document.getElementById("events-upcoming"),
+      upcoming.length ? upcoming.map(eventItemHtml).join("") : "<p>No upcoming events posted right now — check back soon.</p>"
+    );
+    fadeReplace(
+      document.getElementById("events-recent"),
+      past.length ? past.map(eventItemHtml).join("") : "<p>Nothing to look back on just yet.</p>"
+    );
   }
 
   function renderCalendar(rows) {
-    const body = document.getElementById("calendar-body");
-    if (!body) return;
-    body.innerHTML = rows.map(function (r) {
+    const html = rows.map(function (r) {
       return '<tr><td>' + escapeHtml(r.term) + '</td><td>' + escapeHtml(r.duration) + '</td><td>' + escapeHtml(r.assessment) + '</td></tr>';
     }).join("");
+    fadeReplace(document.getElementById("calendar-body"), html);
   }
 
   document.addEventListener("DOMContentLoaded", function () {
