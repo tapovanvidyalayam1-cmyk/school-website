@@ -141,10 +141,10 @@
   </div>
 </footer>
 
-<noscript><style>#notices-list, #notices-home-list, #events-upcoming, #events-recent, #calendar-body { opacity: 1 !important; }</style></noscript>
+<noscript><style>#notices-list, #notices-home-list, #events-upcoming, #events-recent, #events-home-list, #calendar-body { opacity: 1 !important; }</style></noscript>
 <script>
   setTimeout(function () {
-    ["notices-list", "notices-home-list", "events-upcoming", "events-recent", "calendar-body"].forEach(function (id) {
+    ["notices-list", "notices-home-list", "events-upcoming", "events-recent", "events-home-list", "calendar-body"].forEach(function (id) {
       var el = document.getElementById(id);
       if (el && el.style.opacity === "0") el.style.opacity = "1";
     });

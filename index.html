@@ -113,7 +113,41 @@
   </div>
 </section>
 
+<section class="alt">
+  <div class="container grid grid-2" style="align-items:center;">
+    <div>
+      <div class="section-head" style="text-align:left; margin:0;">
+        <div class="eyebrow">Our Campuses</div>
+        <h2>Two Campuses, One Mission</h2>
+      </div>
+      <p>Tapovan Vidyalayam runs two campuses &mdash; in Jaggaiahpet and Penuganchiprolu, Andhra Pradesh &mdash; each built to give students a safe, modern, and inspiring place to learn and grow.</p>
+      <a href="about.html" class="btn btn-outline-navy">Explore Our Campus</a>
+    </div>
+    <img src="images/about/campus-building.jpg" alt="Aerial view of the Tapovan Vidyalayam campus building" class="campus-photo" style="margin-bottom:0;">
+  </div>
+</section>
+
 <section>
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Life at Tapovan</div>
+      <h2>Glimpses of School Life</h2>
+    </div>
+    <div class="grid grid-3 photo-grid">
+      <a class="photo-item" href="gallery.html"><img src="images/gallery/cultural-fest-graduation-2024/2.jpg" alt="Cultural Fest & Graduation Day" loading="lazy"></a>
+      <a class="photo-item" href="gallery.html"><img src="images/gallery/karate/6.jpg" alt="Karate Grand Belt Grading" loading="lazy"></a>
+      <a class="photo-item" href="gallery.html"><img src="images/gallery/sports-meet/7.jpg" alt="Sports Meet" loading="lazy"></a>
+      <a class="photo-item" href="gallery.html"><img src="images/gallery/farewell-day/3.jpg" alt="Farewell Day" loading="lazy"></a>
+      <a class="photo-item" href="gallery.html"><img src="images/gallery/vasantha-panchami/6.jpg" alt="Vasantha Panchami Celebration" loading="lazy"></a>
+      <a class="photo-item" href="gallery.html"><img src="images/gallery/graduation-day/4.jpg" alt="Graduation Day" loading="lazy"></a>
+    </div>
+    <div style="text-align:center; margin-top:26px;">
+      <a href="gallery.html" class="btn btn-primary">View Full Gallery</a>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
   <div class="container">
     <div class="section-head">
       <div class="eyebrow">Stay Informed</div>
@@ -139,6 +173,30 @@
     </ul>
     <div style="text-align:center; margin-top:26px;">
       <a href="notices.html" class="btn btn-outline-navy">View All Notices</a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow">Mark Your Calendar</div>
+      <h2>Upcoming Events</h2>
+    </div>
+    <div class="timeline" id="events-home-list" style="opacity:0; transition: opacity 0.3s ease;">
+      <div class="timeline-item">
+        <span class="date">05 Aug 2026</span>
+        <h3>Parent-Teacher Meeting</h3>
+        <p>Term I progress discussion for all classes. Individual time slots will be shared in advance.</p>
+      </div>
+      <div class="timeline-item">
+        <span class="date">15 Aug 2026</span>
+        <h3>Independence Day Celebration</h3>
+        <p>Flag hoisting, cultural performances, and patriotic programs by our students.</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:26px;">
+      <a href="events.html" class="btn btn-outline-navy">View All Events</a>
     </div>
   </div>
 </section>
@@ -184,13 +242,13 @@
   </div>
 </footer>
 
-<noscript><style>#notices-list, #notices-home-list, #events-upcoming, #events-recent, #calendar-body { opacity: 1 !important; }</style></noscript>
+<noscript><style>#notices-list, #notices-home-list, #events-upcoming, #events-recent, #events-home-list, #calendar-body { opacity: 1 !important; }</style></noscript>
 <script>
   // Safety net: if js/content.js fails to load or errors out for any
   // reason, make sure the sections it's responsible for don't stay
   // invisible forever.
   setTimeout(function () {
-    ["notices-list", "notices-home-list", "events-upcoming", "events-recent", "calendar-body"].forEach(function (id) {
+    ["notices-list", "notices-home-list", "events-upcoming", "events-recent", "events-home-list", "calendar-body"].forEach(function (id) {
       var el = document.getElementById(id);
       if (el && el.style.opacity === "0") el.style.opacity = "1";
     });

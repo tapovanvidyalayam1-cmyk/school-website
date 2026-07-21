@@ -240,6 +240,10 @@ const SHEET_URLS = {
       document.getElementById("events-recent"),
       past.length ? past.map(eventItemHtml).join("") : "<p>Nothing to look back on just yet.</p>"
     );
+    setHtmlAndReveal(
+      document.getElementById("events-home-list"),
+      upcoming.length ? upcoming.slice(0, 2).map(eventItemHtml).join("") : "<p>No upcoming events posted right now — check back soon.</p>"
+    );
   }
 
   function renderCalendar(rows) {
@@ -267,13 +271,15 @@ const SHEET_URLS = {
 
     const upcomingEl = document.getElementById("events-upcoming");
     const recentEl = document.getElementById("events-recent");
-    if (upcomingEl || recentEl) {
+    const homeEventsEl = document.getElementById("events-home-list");
+    if (upcomingEl || recentEl || homeEventsEl) {
       fetchSheet("events").then(function (rows) {
         if (rows && rows.length) {
           renderEvents(rows);
         } else {
           reveal(upcomingEl);
           reveal(recentEl);
+          reveal(homeEventsEl);
         }
       });
     }
